@@ -1,0 +1,14 @@
+.survey-card-container {
+  display: flex;
+  flex-direction: column;
+}
+.survey-card {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
+  margin: 10px;
+  border: 1px solid grey;
+  box-shadow: 20px;
+  min-height: 80px;
+}
