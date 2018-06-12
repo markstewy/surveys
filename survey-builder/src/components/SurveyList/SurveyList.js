@@ -9,6 +9,7 @@ class SurveyList extends Component {
     super(props)
     this.state = {
       surveys: [],
+      surveysOriginal: '',
       edit: false,
       activeSurvey: {},
       activeSurveyIndex: ''
@@ -21,17 +22,27 @@ class SurveyList extends Component {
     axios.get(`http://localhost:3100/fake_data`)
       .then(response => {
         this.setState({
-          surveys: response.data
+          surveys: response.data,
+          surveysOriginal: JSON.stringify(response.data)
         })
       })
   }
 
   toggleEdit(survey, survey_index) {
-    this.setState({
-      edit: !this.state.edit,
-      activeSurvey: survey,
-      activeSurveyIndex: survey_index
-    })
+    if (!survey) {
+      this.setState({
+        surveys: JSON.parse(this.state.surveysOriginal),
+        edit: !this.state.edit,           
+        activeSurvey: JSON.parse('{}'),   //?????
+        activeSurveyIndex: null             //?????
+      })
+    } else {
+      this.setState({
+        edit: !this.state.edit,
+        activeSurvey: survey,
+        activeSurveyIndex: survey_index
+      })
+    }
   }
 
   saveSurvey(e, editedSurvey, surveyIndex) {

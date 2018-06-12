@@ -29,8 +29,8 @@ app.patch('/editSurvey/:index', (req, res) => {
 })
 
 app.delete('/deleteSurvey/:index', (req, res) => {
-  fake_data.splice(req.params.index)
-  res.status(200).send(req.params.index)
+  fake_data.splice(req.params.index, 1)
+  res.status(200).send(fake_data)
 })
 
 

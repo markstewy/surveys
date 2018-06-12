@@ -10,8 +10,9 @@ class SurveyEditor extends Component {
   }
 // ADD SURVEYS, add prompts, add inputs and input fields
 // Delete Survey
+
   handleChange(e, name, prompt_index, input_index, option_index, option_key) {
-    const editedSurvey = Object.assign({}, this.state.editedSurvey)
+    let editedSurvey = Object.assign({}, this.state.editedSurvey)
     switch (name) {
       case 'name': 
         editedSurvey.name = e.target.value
@@ -34,12 +35,10 @@ class SurveyEditor extends Component {
       default:
         console.warn('SurveyEditor.js handleChange switch found no match')
     }
-
     this.setState({
       editedSurvey: editedSurvey
     })
   }
-
 
   // GET EDITED SURVEY MODAL TO RESET WHEN CLOSED AND OPENED (IF NOT SAVED) 
   // ADD DELETE WITH SAME BEHAVIOR
@@ -57,12 +56,10 @@ class SurveyEditor extends Component {
     return (
       <div className={'modal-container'}>
 
-        <div onClick={this.props.toggleEdit} className="modal-backdrop"></div>
-
+        <div onClick={(e) => this.props.toggleEdit()} className="modal-backdrop"></div>
+        
         <div className={'modal-card'}>
-
-          <div onClick={this.props.toggleEdit} className={'modal-close-x'}>x</div>
-
+          <div onClick={(e) => this.props.toggleEdit()} className={'modal-close-x'}>x</div>
           <form onSubmit={(e) => this.props.saveSurvey(e, this.state.editedSurvey, this.props.activeSurveyIndex)}>
             <label>
               Survey Name:
