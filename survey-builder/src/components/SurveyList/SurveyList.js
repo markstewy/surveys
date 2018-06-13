@@ -1,7 +1,10 @@
 import React, { Component } from 'react'
+import axios from 'axios'
 import './SurveyList.css'
 import SurveyEditor from '../SurveyEditor/SurveyEditor'
-import axios from 'axios'
+import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'material-ui/Card'
+import FlatButton from 'material-ui/FlatButton'
+
 
 
 class SurveyList extends Component {
@@ -96,15 +99,13 @@ class SurveyList extends Component {
         <div className={'survey-card-container'}>
           {this.state.surveys.map((survey, survey_index) => {
             return (
-              <div key={`survey-list-item-${survey_index}`} className={'survey-card'}>
-                <div>
-                  {survey.name}
-                </div>
-                <div>
-                  <button onClick={(e) => this.toggleEdit(survey, survey_index)}>edit</button>
-                  <button onClick={(e) => this.deleteSurvey(survey_index)}>delete</button>
-                </div>
-              </div>
+              <Card key={`survey-list-item-${survey_index}`}>
+                <CardHeader title={survey.name} />
+                <CardActions>
+                  <FlatButton onClick={(e) => this.toggleEdit(survey, survey_index)} label='Edit' />
+                  <FlatButton onClick={(e) => this.deleteSurvey(survey_index)} label='Delete' />
+                </CardActions>
+              </Card>
             )
           })}
         </div>
