@@ -29,7 +29,6 @@ class SurveyList extends Component {
   }
 
   toggleEdit(survey, survey_index) {
-    console.log(survey, survey_index,'lkj')
     if (!survey) {
       this.setState({
         surveys: JSON.parse(this.state.surveysOriginal),
@@ -47,14 +46,14 @@ class SurveyList extends Component {
   }
 
   saveSurvey(e, editedSurvey, surveyIndex) {
-    // e.preventDefault()
     axios.patch(`http://localhost:3100/editSurvey/${surveyIndex}`, {survey: editedSurvey})
     .then(res => {
       const surveys = this.state.surveys.slice()
       surveys.splice(this.state.activeSurveyIndex, 1, res.data)
       this.setState({
           edit: !this.state.edit,
-          surveys: surveys
+          surveys: surveys,
+          surveysOriginal: JSON.stringify(surveys)
         })
     })
     .catch(err => console.warn(err))
@@ -80,7 +79,8 @@ class SurveyList extends Component {
       const surveys = this.state.surveys.slice()
       surveys.splice(res.data, 1)
       this.setState({
-        surveys: surveys
+        surveys: surveys,
+        surveysOriginal: JSON.stringify(surveys)
       })
     })
     .catch(err => console.warn(err))
