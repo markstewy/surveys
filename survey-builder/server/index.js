@@ -30,7 +30,17 @@ app.patch('/editSurvey/:index', (req, res) => {
 
 app.delete('/deleteSurvey/:index', (req, res) => {
   fake_data.splice(req.params.index, 1)
-  res.status(200).send(fake_data)
+  res.status(200).send(req.params.index)
+})
+
+app.post('/addSurvey', (req, res) => {
+  const emptySurvey = {
+    id: Math.random(),
+    name: 'New Survey',
+    prompts: []
+  }
+  fake_data.push(emptySurvey)
+  res.status(200).send(emptySurvey)
 })
 
 

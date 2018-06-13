@@ -29,6 +29,7 @@ class SurveyList extends Component {
   }
 
   toggleEdit(survey, survey_index) {
+    console.log(survey, survey_index,'lkj')
     if (!survey) {
       this.setState({
         surveys: JSON.parse(this.state.surveysOriginal),
@@ -46,7 +47,7 @@ class SurveyList extends Component {
   }
 
   saveSurvey(e, editedSurvey, surveyIndex) {
-    e.preventDefault()
+    // e.preventDefault()
     axios.patch(`http://localhost:3100/editSurvey/${surveyIndex}`, {survey: editedSurvey})
     .then(res => {
       const surveys = this.state.surveys.slice()
@@ -60,6 +61,19 @@ class SurveyList extends Component {
     
   }
 
+  addSurvey() {
+    axios.post('http://localhost:3100/addSurvey')
+    .then(res => {
+      const surveys = this.state.surveys.slice()
+      surveys.push(res.data)
+      this.setState({
+        surveys: surveys,
+        surveysOriginal: JSON.stringify(surveys)
+      })
+    })
+    .catch(err => console.warn(err))
+  }
+
   deleteSurvey(index) {
     axios.delete(`http://localhost:3100/deleteSurvey/${index}`)
     .then(res => {
@@ -70,7 +84,6 @@ class SurveyList extends Component {
       })
     })
     .catch(err => console.warn(err))
-    
   }
 
   render() {
@@ -79,6 +92,7 @@ class SurveyList extends Component {
         {this.state.edit ? <SurveyEditor activeSurvey={this.state.activeSurvey} activeSurveyIndex={this.state.activeSurveyIndex} toggleEdit={this.toggleEdit} saveSurvey={this.saveSurvey} /> : null}
         <h1>Survey List</h1>
         <br />
+        <button onClick={() => this.addSurvey()}>Add Survey</button>
         <div className={'survey-card-container'}>
           {this.state.surveys.map((survey, survey_index) => {
             return (
