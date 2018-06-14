@@ -12,6 +12,9 @@ import IconButton from 'material-ui/IconButton'
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert'
 import IconMenu from 'material-ui/IconMenu'
 import MenuItem from 'material-ui/MenuItem'
+import Dialog from 'material-ui/Dialog';
+import FlatButton from 'material-ui/FlatButton';
+import { RadioButton, RadioButtonGroup } from 'material-ui/RadioButton';
 
 
 
@@ -25,7 +28,6 @@ class SurveyList extends Component {
       activeSurvey: {},
       activeSurveyIndex: ''
     }
-    this.toggleEdit = this.toggleEdit.bind(this)
     this.saveSurvey = this.saveSurvey.bind(this)
   }
 
@@ -40,11 +42,12 @@ class SurveyList extends Component {
   }
 
   toggleEdit(survey, survey_index) {
-    if (!survey) {
+    if (survey === 'reset') {
+      console.log("close")
       this.setState({
         surveys: JSON.parse(this.state.surveysOriginal),
         edit: !this.state.edit,
-        activeSurvey: JSON.parse('{}'),   
+        activeSurvey: JSON.parse('{}'),
         activeSurveyIndex: null
       })
     } else {
@@ -53,7 +56,7 @@ class SurveyList extends Component {
         activeSurvey: survey,
         activeSurveyIndex: survey_index
       })
-    }
+    } 
   }
 
   saveSurvey(e, editedSurvey, surveyIndex) {
@@ -100,42 +103,61 @@ class SurveyList extends Component {
   render() {
     return (
       <div>
-        {this.state.edit ? <SurveyEditor activeSurvey={this.state.activeSurvey} activeSurveyIndex={this.state.activeSurveyIndex} toggleEdit={this.toggleEdit} saveSurvey={this.saveSurvey} /> : null}
+        <Dialog
+          title="Scrollable Dialog"
+          actions={
+            <span>
+              <FlatButton
+                label="Cancel"
+                primary={true}
+                onClick={() => this.toggleEdit('reset')}
+              />
+              <FlatButton
+                label="Save"
+                primary={true}
+                keyboardFocused={true}
+                // onClick={}
+              />
+            </span>
+          }
+          modal={true}
+          open={this.state.edit}
+          autoScrollBodyContent={true}>
+          <SurveyEditor activeSurvey={this.state.activeSurvey} activeSurveyIndex={this.state.activeSurveyIndex} toggleEdit={this.toggleEdit} saveSurvey={this.saveSurvey} />
+        </Dialog>
+
+
+
         <Card className={'survey-card-container'}>
           <CardHeader
             title='Survey Manager'
           />
           <RaisedButton onClick={() => this.addSurvey()} label='Add' primary={true} />
           <List>
-          {this.state.surveys.map((survey, survey_index) => {
-            return (
-              <div key={`survey-list-item-${survey_index}`}>
-                <Divider inset={false} />
-                <ListItem
-                  rightIconButton={
-                    <IconMenu iconButtonElement={
-                      <IconButton
-                      touch={true}
-                      tooltip="more"
-                      tooltipPosition="bottom-left">
-                      <MoreVertIcon color={grey400} />
-                    </IconButton>
-                    }>
-                      <MenuItem onClick={(e) => this.toggleEdit(survey, survey_index)}>Edit</MenuItem>
-                      <MenuItem onClick={(e) => this.deleteSurvey(survey_index)}>Delete</MenuItem>
-                    </IconMenu>
-                  }
-                  primaryText={survey.name}
-                />
-              </div>
-
-
-          )
-        })}
-
-
-            </List>
-
+            {this.state.surveys.map((survey, survey_index) => {
+              return (
+                <div key={`survey-list-item-${survey_index}`}>
+                  <Divider inset={false} />
+                  <ListItem
+                    rightIconButton={
+                      <IconMenu iconButtonElement={
+                        <IconButton
+                          touch={true}
+                          tooltip="more"
+                          tooltipPosition="bottom-left">
+                          <MoreVertIcon color={grey400} />
+                        </IconButton>
+                      }>
+                        <MenuItem onClick={(e) => this.toggleEdit(survey, survey_index)}>Edit</MenuItem>
+                        <MenuItem onClick={(e) => this.deleteSurvey(survey_index)}>Delete</MenuItem>
+                      </IconMenu>
+                    }
+                    primaryText={survey.name}
+                  />
+                </div>
+              )
+            })}
+          </List>
         </Card>
       </div>
     )

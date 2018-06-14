@@ -1,11 +1,6 @@
 import React, { Component } from 'react'
 import './SurveyEditor.scss'
 
-import Dialog from 'material-ui/Dialog';
-import FlatButton from 'material-ui/FlatButton';
-import RaisedButton from 'material-ui/RaisedButton';
-import {RadioButton, RadioButtonGroup} from 'material-ui/RadioButton';
-
 class SurveyEditor extends Component {
   constructor(props) {
     super(props)
@@ -114,78 +109,67 @@ class SurveyEditor extends Component {
 
   render() {
     return (
-      <div className={'modal-container'}>
-        <div onClick={(e) => this.props.toggleEdit()} className="modal-backdrop"></div>
-        <div className={'modal-card'}>
-          {/* MODAL CONTENTS */}
-          <div onClick={(e) => this.props.toggleEdit()} className={'modal-close-x'}>x</div>
-          <div>
-            <input value={this.state.editedSurvey.name} onChange={(e) => this.handleChange(e, 'name')} />
-            <br />
-            <button onClick={(e) => this.addPrompt()}>add prompt</button>
-            <br />
-            {/*PROMPTS ARRAY */}
-            {this.state.editedSurvey.prompts.map((prompt, prompt_index) => {
-              return (
-                <div
-                  key={`prompt-text-${prompt_index}`}
-                  style={{ 'border': '1px solid black', 'margin': '20px', 'boxShadow': ' 5px 10px #80808040' }}>
-                  <button onClick={(e) => this.deletePrompt(prompt_index)}>delete prompt</button><br />
-                  <p>
-                    <textarea style={{ width: '100%' }} value={prompt.promptText} onChange={(e) => this.handleChange(e, 'prompt_text', prompt_index)} required />
-                  </p>
-                  <button onClick={(e) => this.addInput(prompt_index)}>add input</button>
-                  <br/><br/>
-                  {/* INPUTS ARRAY */}
-                  {prompt.inputs.reduce((agg, input, input_index) => {
-                    agg.push(
-                      <div key={`prompt${prompt_index}-input${input_index}-${input.type}`}>
-                        {/* // Render the following for every input type: */}
-                        input type:
+      <div>
+        <input value={this.state.editedSurvey.name} onChange={(e) => this.handleChange(e, 'name')} />
+        <br />
+        <button onClick={(e) => this.addPrompt()}>add prompt</button>
+        <br />
+        {/*PROMPTS ARRAY */}
+        {this.state.editedSurvey.prompts.map((prompt, prompt_index) => {
+          return (
+            <div
+              key={`prompt-text-${prompt_index}`}>
+              <button onClick={(e) => this.deletePrompt(prompt_index)}>delete prompt</button><br />
+              <p>
+                <textarea value={prompt.promptText} onChange={(e) => this.handleChange(e, 'prompt_text', prompt_index)} required />
+              </p>
+              <button onClick={(e) => this.addInput(prompt_index)}>add input</button>
+              <br /><br />
+              {/* INPUTS ARRAY */}
+              {prompt.inputs.reduce((agg, input, input_index) => {
+                agg.push(
+                  <div key={`prompt${prompt_index}-input${input_index}-${input.type}`}>
+                    {/* // Render the following for every input type: */}
+                    input type:
                           <select defaultValue={input.type} onChange={(e) => this.handleChange(e, 'input_type', prompt_index, input_index)}>
-                          <option value={'short_text'}>short text</option>
-                          <option value={'text_area'}>text area</option>
-                          <option value={'multiple_choice'}>multiple choice</option>
-                          <option value={'dropdown'}>dropdown</option>
-                        </select>
-                        <button onClick={(e) => this.deleteInput(prompt_index, input_index)}>delete input</button>
-                        <br />
-                        {(input.type === 'short_text' || input.type === 'text_area') ?
-                          // Only render the following for short and long text types:
-                          <div>
-                            Placeholder: <input value={input.placeholder} onChange={(e) => this.handleChange(e, 'placeholder', prompt_index, input_index)} />
-                            Label: <input value={input.label} onChange={(e) => this.handleChange(e, 'label', prompt_index, input_index)} />
-                          </div>
-                          :
-                          //Only render the following for multiple choice and dropdown types:
-                          <div>
-                            <button onClick={(e) => this.addOption(e, prompt_index, input_index)}>add option</button>
-                            <br />
-                            {/* OPTIONS ARRAY */}
-                            {input.options.map((option, option_index) => {
-                              return (
-                                <div key={`${option_index}-${input.type}`}>
-                                  Text: <input value={option.text} onChange={(e) => this.handleChange(e, 'option', prompt_index, input_index, option_index, 'text')} />
-                                  Value: <input value={option.value} onChange={(e) => this.handleChange(e, 'option', prompt_index, input_index, option_index, 'value')} />
-                                  <button onClick={(e) => this.deleteOption(e, prompt_index, input_index, option_index)}>delete option</button>
-                                </div>
-                              )
-                            })}
-                          </div>
-                        }
+                      <option value={'short_text'}>short text</option>
+                      <option value={'text_area'}>text area</option>
+                      <option value={'multiple_choice'}>multiple choice</option>
+                      <option value={'dropdown'}>dropdown</option>
+                    </select>
+                    <button onClick={(e) => this.deleteInput(prompt_index, input_index)}>delete input</button>
+                    <br />
+                    {(input.type === 'short_text' || input.type === 'text_area') ?
+                      // Only render the following for short and long text types:
+                      <div>
+                        Placeholder: <input value={input.placeholder} onChange={(e) => this.handleChange(e, 'placeholder', prompt_index, input_index)} />
+                        Label: <input value={input.label} onChange={(e) => this.handleChange(e, 'label', prompt_index, input_index)} />
                       </div>
-                    )
-                    return agg
-                  }, [])}
-                </div>
-              )
-            })}
-            <div className={'modal-footer'}>
-              <button onClick={(e) => this.props.saveSurvey(e, this.state.editedSurvey, this.props.activeSurveyIndex)}>Save</button>
+                      :
+                      //Only render the following for multiple choice and dropdown types:
+                      <div>
+                        <button onClick={(e) => this.addOption(e, prompt_index, input_index)}>add option</button>
+                        <br />
+                        {/* OPTIONS ARRAY */}
+                        {input.options.map((option, option_index) => {
+                          return (
+                            <div key={`${option_index}-${input.type}`}>
+                              Text: <input value={option.text} onChange={(e) => this.handleChange(e, 'option', prompt_index, input_index, option_index, 'text')} />
+                              Value: <input value={option.value} onChange={(e) => this.handleChange(e, 'option', prompt_index, input_index, option_index, 'value')} />
+                              <button onClick={(e) => this.deleteOption(e, prompt_index, input_index, option_index)}>delete option</button>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    }
+                  </div>
+                )
+                return agg
+              }, [])}
             </div>
-          </div>
-
-        </div>
+          )
+        })}
+          <button onClick={(e) => this.props.saveSurvey(e, this.state.editedSurvey, this.props.activeSurveyIndex)}>Save</button>
       </div>
     )
   }
