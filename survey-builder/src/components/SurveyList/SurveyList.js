@@ -4,7 +4,7 @@ import SurveyEditor from '../SurveyEditor/SurveyEditor'
 import './SurveyList.scss'
 
 import { Card, CardHeader } from 'material-ui/Card'
-import RaisedButton from 'material-ui/RaisedButton';
+import RaisedButton from 'material-ui/RaisedButton'
 import { List, ListItem } from 'material-ui/List'
 import Divider from 'material-ui/Divider'
 import { grey400 } from 'material-ui/styles/colors'
@@ -12,23 +12,27 @@ import IconButton from 'material-ui/IconButton'
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert'
 import IconMenu from 'material-ui/IconMenu'
 import MenuItem from 'material-ui/MenuItem'
-import Dialog from 'material-ui/Dialog';
-import FlatButton from 'material-ui/FlatButton';
-import { RadioButton, RadioButtonGroup } from 'material-ui/RadioButton';
-
-
+import Dialog from 'material-ui/Dialog'
+import FlatButton from 'material-ui/FlatButton'
+import TextField from 'material-ui/TextField'
 
 class SurveyList extends Component {
   constructor(props) {
     super(props)
     this.state = {
       surveys: [],
-      surveysOriginal: '',
-      edit: false,
       activeSurvey: {},
-      activeSurveyIndex: ''
+      activeSurveyIndex: '',
+      surveysOriginal: '',
+      modalOpen: false,
     }
     this.saveSurvey = this.saveSurvey.bind(this)
+    this.handleChange = this.handleChange.bind(this)
+    this.deletePrompt = this.deletePrompt.bind(this)
+    this.deleteInput = this.deleteInput.bind(this)
+    this.addInput = this.addInput.bind(this)
+    this.deleteOption = this.deleteOption.bind(this)
+    this.addOption = this.addOption.bind(this)
   }
 
   componentDidMount() {
@@ -41,31 +45,31 @@ class SurveyList extends Component {
       })
   }
 
-  toggleEdit(survey, survey_index) {
+  toggleModal(survey, survey_index) {
     if (survey === 'reset') {
-      console.log("close")
       this.setState({
         surveys: JSON.parse(this.state.surveysOriginal),
-        edit: !this.state.edit,
+        modalOpen: !this.state.modalOpen,
         activeSurvey: JSON.parse('{}'),
         activeSurveyIndex: null
       })
     } else {
       this.setState({
-        edit: !this.state.edit,
+        modalOpen: !this.state.modalOpen,
         activeSurvey: survey,
         activeSurveyIndex: survey_index
       })
-    } 
+    }
   }
 
-  saveSurvey(e, editedSurvey, surveyIndex) {
-    axios.patch(`http://localhost:3100/editSurvey/${surveyIndex}`, { survey: editedSurvey })
+  // SURVEY METHODS
+  saveSurvey() {
+    axios.patch(`http://localhost:3100/editSurvey/${this.state.activeSurveyIndex}`, { survey: this.state.activeSurvey })
       .then(res => {
         const surveys = this.state.surveys.slice()
         surveys.splice(this.state.activeSurveyIndex, 1, res.data)
         this.setState({
-          edit: !this.state.edit,
+          modalOpen: !this.state.modalOpen,
           surveys: surveys,
           surveysOriginal: JSON.stringify(surveys)
         })
@@ -73,7 +77,6 @@ class SurveyList extends Component {
       .catch(err => console.warn(err))
 
   }
-
   addSurvey() {
     axios.post('http://localhost:3100/addSurvey')
       .then(res => {
@@ -86,7 +89,6 @@ class SurveyList extends Component {
       })
       .catch(err => console.warn(err))
   }
-
   deleteSurvey(index) {
     axios.delete(`http://localhost:3100/deleteSurvey/${index}`)
       .then(res => {
@@ -100,33 +102,150 @@ class SurveyList extends Component {
       .catch(err => console.warn(err))
   }
 
+  // PROMPT METHODS
+  addPrompt() {
+    const activeSurvey = Object.assign({}, this.state.activeSurvey)
+    activeSurvey.prompts.push(
+      {
+        promptText: 'How was your overall experience?',
+        inputs: [
+          {
+            type: 'text_area',
+            label: '',
+            placeholder: 'type response here',
+            options: []
+          }
+        ]
+      }
+    )
+    this.setState({
+      activeSurvey: activeSurvey
+    })
+  }
+  deletePrompt(prompt_index) {
+    const activeSurvey = Object.assign({}, this.state.activeSurvey)
+    // const activeSurvey = {...this.state.activeSurvey, myproperty: "stuff"}
+    activeSurvey.prompts.splice(prompt_index, 1)
+    this.setState({
+      activeSurvey: activeSurvey
+    })
+  }
+
+  // INPUT METHODS
+  addInput(prompt_index) {
+    const activeSurvey = Object.assign({}, this.state.activeSurvey)
+    activeSurvey.prompts[prompt_index].inputs.push(
+      {
+        type: 'text_area',
+        label: '',
+        placeholder: 'type response here',
+        options: []
+      }
+    )
+    this.setState({
+      activeSurvey: activeSurvey
+    })
+  }
+  deleteInput(prompt_index, input_index) {
+    const activeSurvey = Object.assign({}, this.state.activeSurvey)
+    activeSurvey.prompts[prompt_index].inputs.splice(input_index, 1)
+    this.setState({
+      activeSurvey: activeSurvey
+    })
+  }
+
+  // OPTION METHODS
+  addOption(prompt_index, input_index) {
+    const activeSurvey = Object.assign({}, this.state.activeSurvey)
+    activeSurvey.prompts[prompt_index].inputs[input_index].options.push({ text: '', value: '' })
+    this.setState({
+      activeSurvey: activeSurvey
+    })
+  }
+
+  deleteOption(prompt_index, input_index, option_index) {
+    const activeSurvey = Object.assign({}, this.state.activeSurvey)
+    activeSurvey.prompts[prompt_index].inputs[input_index].options.splice(option_index, 1)
+    this.setState({
+      activeSurvey: activeSurvey
+    })
+  }
+
+  // ALL PURPOSE handleChange - prompt, input and option array edit
+  handleChange(e, name, prompt_index, input_index, option_index, option_key) {
+    let activeSurvey = Object.assign({}, this.state.activeSurvey)
+    switch (name) {
+      case 'name':
+        activeSurvey.name = e.target.value
+        break
+      case 'prompt_text':
+        activeSurvey.prompts[prompt_index].promptText = e.target.value
+        break
+      case 'input_type':
+        activeSurvey.prompts[prompt_index].inputs[input_index].type = e.target.value
+        break
+      case 'placeholder':
+        activeSurvey.prompts[prompt_index].inputs[input_index].placeholder = e.target.value
+        break
+      case 'label':
+        activeSurvey.prompts[prompt_index].inputs[input_index].label = e.target.value
+        break
+      case 'option':
+        activeSurvey.prompts[prompt_index].inputs[input_index].options[option_index][option_key] = e.target.value
+        break
+      default:
+        console.warn('handleChange switch found no match')
+    }
+    this.setState({
+      activeSurvey: activeSurvey
+    })
+  }
+
   render() {
+    const dialogActions = (
+      <span>
+        <FlatButton
+          label="Add Question"
+          primary={true}
+          onClick={() => this.addPrompt()}
+        />
+        <FlatButton
+          label="Cancel"
+          primary={true}
+          onClick={() => this.toggleModal('reset')}
+        />
+        <FlatButton
+          label="Save"
+          primary={true}
+          keyboardFocused={true}
+          onClick={(e) => this.saveSurvey()}
+        />
+      </span>
+    )
     return (
       <div>
         <Dialog
-          title="Scrollable Dialog"
-          actions={
-            <span>
-              <FlatButton
-                label="Cancel"
-                primary={true}
-                onClick={() => this.toggleEdit('reset')}
-              />
-              <FlatButton
-                label="Save"
-                primary={true}
-                keyboardFocused={true}
-                // onClick={}
-              />
-            </span>
+          title={
+            <TextField
+              id="text-field-default"
+              value={this.state.activeSurvey.name} 
+              onChange={(e) => this.handleChange(e, 'name')}
+            />
           }
+          actions={dialogActions}
           modal={true}
-          open={this.state.edit}
+          open={this.state.modalOpen}
           autoScrollBodyContent={true}>
-          <SurveyEditor activeSurvey={this.state.activeSurvey} activeSurveyIndex={this.state.activeSurveyIndex} toggleEdit={this.toggleEdit} saveSurvey={this.saveSurvey} />
+          <SurveyEditor
+            activeSurvey={this.state.activeSurvey}
+            activeSurveyIndex={this.state.activeSurveyIndex}
+            handleChange={this.handleChange}
+            deletePrompt={this.deletePrompt}
+            deleteInput={this.deleteInput}
+            addInput={this.addInput}
+            deleteOption={this.deleteOption}
+            addOption={this.addOption} />
         </Dialog>
-
-
 
         <Card className={'survey-card-container'}>
           <CardHeader
@@ -148,7 +267,7 @@ class SurveyList extends Component {
                           <MoreVertIcon color={grey400} />
                         </IconButton>
                       }>
-                        <MenuItem onClick={(e) => this.toggleEdit(survey, survey_index)}>Edit</MenuItem>
+                        <MenuItem onClick={(e) => this.toggleModal(survey, survey_index)}>Edit</MenuItem>
                         <MenuItem onClick={(e) => this.deleteSurvey(survey_index)}>Delete</MenuItem>
                       </IconMenu>
                     }
