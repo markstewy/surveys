@@ -1,6 +1,11 @@
 import React, { Component } from 'react'
 import './SurveyEditor.scss'
 
+import Dialog from 'material-ui/Dialog';
+import FlatButton from 'material-ui/FlatButton';
+import RaisedButton from 'material-ui/RaisedButton';
+import {RadioButton, RadioButtonGroup} from 'material-ui/RadioButton';
+
 class SurveyEditor extends Component {
   constructor(props) {
     super(props)
@@ -61,6 +66,7 @@ class SurveyEditor extends Component {
 
   deletePrompt(prompt_index) {
     const editedSurvey = Object.assign({}, this.state.editedSurvey)
+    // const editedSurvey = {...this.state.editedSurvey, myproperty: "stuff"}
     editedSurvey.prompts.splice(prompt_index, 1)
     this.setState({
       editedSurvey: editedSurvey

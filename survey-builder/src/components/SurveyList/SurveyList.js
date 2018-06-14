@@ -1,9 +1,17 @@
 import React, { Component } from 'react'
 import axios from 'axios'
-import './SurveyList.css'
 import SurveyEditor from '../SurveyEditor/SurveyEditor'
-import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'material-ui/Card'
-import FlatButton from 'material-ui/FlatButton'
+import './SurveyList.scss'
+
+import { Card, CardHeader } from 'material-ui/Card'
+import RaisedButton from 'material-ui/RaisedButton';
+import { List, ListItem } from 'material-ui/List'
+import Divider from 'material-ui/Divider'
+import { grey400 } from 'material-ui/styles/colors'
+import IconButton from 'material-ui/IconButton'
+import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert'
+import IconMenu from 'material-ui/IconMenu'
+import MenuItem from 'material-ui/MenuItem'
 
 
 
@@ -35,9 +43,9 @@ class SurveyList extends Component {
     if (!survey) {
       this.setState({
         surveys: JSON.parse(this.state.surveysOriginal),
-        edit: !this.state.edit,           
-        activeSurvey: JSON.parse('{}'),   //?????
-        activeSurveyIndex: null             //?????
+        edit: !this.state.edit,
+        activeSurvey: JSON.parse('{}'),   
+        activeSurveyIndex: null
       })
     } else {
       this.setState({
@@ -49,66 +57,86 @@ class SurveyList extends Component {
   }
 
   saveSurvey(e, editedSurvey, surveyIndex) {
-    axios.patch(`http://localhost:3100/editSurvey/${surveyIndex}`, {survey: editedSurvey})
-    .then(res => {
-      const surveys = this.state.surveys.slice()
-      surveys.splice(this.state.activeSurveyIndex, 1, res.data)
-      this.setState({
+    axios.patch(`http://localhost:3100/editSurvey/${surveyIndex}`, { survey: editedSurvey })
+      .then(res => {
+        const surveys = this.state.surveys.slice()
+        surveys.splice(this.state.activeSurveyIndex, 1, res.data)
+        this.setState({
           edit: !this.state.edit,
           surveys: surveys,
           surveysOriginal: JSON.stringify(surveys)
         })
-    })
-    .catch(err => console.warn(err))
-    
+      })
+      .catch(err => console.warn(err))
+
   }
 
   addSurvey() {
     axios.post('http://localhost:3100/addSurvey')
-    .then(res => {
-      const surveys = this.state.surveys.slice()
-      surveys.push(res.data)
-      this.setState({
-        surveys: surveys,
-        surveysOriginal: JSON.stringify(surveys)
+      .then(res => {
+        const surveys = this.state.surveys.slice()
+        surveys.push(res.data)
+        this.setState({
+          surveys: surveys,
+          surveysOriginal: JSON.stringify(surveys)
+        })
       })
-    })
-    .catch(err => console.warn(err))
+      .catch(err => console.warn(err))
   }
 
   deleteSurvey(index) {
     axios.delete(`http://localhost:3100/deleteSurvey/${index}`)
-    .then(res => {
-      const surveys = this.state.surveys.slice()
-      surveys.splice(res.data, 1)
-      this.setState({
-        surveys: surveys,
-        surveysOriginal: JSON.stringify(surveys)
+      .then(res => {
+        const surveys = this.state.surveys.slice()
+        surveys.splice(res.data, 1)
+        this.setState({
+          surveys: surveys,
+          surveysOriginal: JSON.stringify(surveys)
+        })
       })
-    })
-    .catch(err => console.warn(err))
+      .catch(err => console.warn(err))
   }
 
   render() {
     return (
       <div>
         {this.state.edit ? <SurveyEditor activeSurvey={this.state.activeSurvey} activeSurveyIndex={this.state.activeSurveyIndex} toggleEdit={this.toggleEdit} saveSurvey={this.saveSurvey} /> : null}
-        <h1>Survey List</h1>
-        <br />
-        <button onClick={() => this.addSurvey()}>Add Survey</button>
-        <div className={'survey-card-container'}>
+        <Card className={'survey-card-container'}>
+          <CardHeader
+            title='Survey Manager'
+          />
+          <RaisedButton onClick={() => this.addSurvey()} label='Add' primary={true} />
+          <List>
           {this.state.surveys.map((survey, survey_index) => {
             return (
-              <Card key={`survey-list-item-${survey_index}`}>
-                <CardHeader title={survey.name} />
-                <CardActions>
-                  <FlatButton onClick={(e) => this.toggleEdit(survey, survey_index)} label='Edit' />
-                  <FlatButton onClick={(e) => this.deleteSurvey(survey_index)} label='Delete' />
-                </CardActions>
-              </Card>
-            )
-          })}
-        </div>
+              <div key={`survey-list-item-${survey_index}`}>
+                <Divider inset={false} />
+                <ListItem
+                  rightIconButton={
+                    <IconMenu iconButtonElement={
+                      <IconButton
+                      touch={true}
+                      tooltip="more"
+                      tooltipPosition="bottom-left">
+                      <MoreVertIcon color={grey400} />
+                    </IconButton>
+                    }>
+                      <MenuItem onClick={(e) => this.toggleEdit(survey, survey_index)}>Edit</MenuItem>
+                      <MenuItem onClick={(e) => this.deleteSurvey(survey_index)}>Delete</MenuItem>
+                    </IconMenu>
+                  }
+                  primaryText={survey.name}
+                />
+              </div>
+
+
+          )
+        })}
+
+
+            </List>
+
+        </Card>
       </div>
     )
   }
