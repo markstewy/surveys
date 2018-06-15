@@ -74,8 +74,8 @@ function SurveyEditor(props) {
                 }, [])}
               </CardText>
               <CardActions>
-                <FlatButton label="Add User Input" onClick={() => props.addInput(prompt_index)} />
-                <FlatButton label="Delete Question" onClick={() => props.deletePrompt(prompt_index)} />
+                <FlatButton primary={true} label="Add User Input" onClick={() => props.addInput(prompt_index)} />
+                <FlatButton secondary={true} label="Delete Question" onClick={() => props.deletePrompt(prompt_index)} />
               </CardActions>
             </Card>
 

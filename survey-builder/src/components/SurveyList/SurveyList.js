@@ -13,7 +13,6 @@ import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert'
 import IconMenu from 'material-ui/IconMenu'
 import MenuItem from 'material-ui/MenuItem'
 import Dialog from 'material-ui/Dialog'
-import FlatButton from 'material-ui/FlatButton'
 import TextField from 'material-ui/TextField'
 
 class SurveyList extends Component {
@@ -182,6 +181,7 @@ class SurveyList extends Component {
         activeSurvey.prompts[prompt_index].promptText = e.target.value
         break
       case 'input_type':
+        console.log(e.target.value, 'hit input type', prompt_index, input_index)
         activeSurvey.prompts[prompt_index].inputs[input_index].type = e.target.value
         break
       case 'placeholder':
@@ -204,17 +204,14 @@ class SurveyList extends Component {
   render() {
     const dialogActions = (
       <span>
-        <FlatButton
-          label="Add Question"
-          primary={true}
-          onClick={() => this.addPrompt()}
-        />
-        <FlatButton
+        <RaisedButton
+          style={{ 'marginRight': '20px' }}
           label="Cancel"
-          primary={true}
+          secondary={true}
           onClick={() => this.toggleModal('reset')}
         />
-        <FlatButton
+        <RaisedButton
+          style={{ 'marginRight': '20px' }}
           label="Save"
           primary={true}
           keyboardFocused={true}
@@ -226,11 +223,19 @@ class SurveyList extends Component {
       <div>
         <Dialog
           title={
-            <TextField
-              id="text-field-default"
-              value={this.state.activeSurvey.name} 
-              onChange={(e) => this.handleChange(e, 'name')}
-            />
+            <div>
+              <TextField
+                id="text-field-default"
+                value={this.state.activeSurvey.name}
+                onChange={(e) => this.handleChange(e, 'name')}
+              />
+              <RaisedButton
+                style={{ 'float': 'right' }}
+                label="Add Question"
+                primary={true}
+                onClick={() => this.addPrompt()}
+              />
+            </div>
           }
           actions={dialogActions}
           modal={true}
@@ -249,9 +254,8 @@ class SurveyList extends Component {
 
         <Card className={'survey-card-container'}>
           <CardHeader
-            title='Survey Manager'
+            title={ <RaisedButton onClick={() => this.addSurvey()} label='Add Survey' primary={true} />}
           />
-          <RaisedButton onClick={() => this.addSurvey()} label='Add Survey' primary={true} />
           <List>
             {this.state.surveys.map((survey, survey_index) => {
               return (
@@ -259,14 +263,17 @@ class SurveyList extends Component {
                   <Divider inset={false} />
                   <ListItem
                     rightIconButton={
-                      <IconMenu iconButtonElement={
-                        <IconButton
-                          touch={true}
-                          tooltip="more"
-                          tooltipPosition="bottom-left">
-                          <MoreVertIcon color={grey400} />
-                        </IconButton>
-                      }>
+                      <IconMenu
+                        anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
+                        targetOrigin={{ horizontal: 'right', vertical: 'top' }}
+                        iconButtonElement={
+                          <IconButton
+                            touch={true}
+                            tooltip="more"
+                            tooltipPosition="bottom-left">
+                            <MoreVertIcon color={grey400} />
+                          </IconButton>
+                        }>
                         <MenuItem onClick={(e) => this.toggleModal(survey, survey_index)}>Edit</MenuItem>
                         <MenuItem onClick={(e) => this.deleteSurvey(survey_index)}>Delete</MenuItem>
                       </IconMenu>
