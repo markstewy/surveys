@@ -251,7 +251,7 @@ class SurveyList extends Component {
           <CardHeader
             title='Survey Manager'
           />
-          <RaisedButton onClick={() => this.addSurvey()} label='Add' primary={true} />
+          <RaisedButton onClick={() => this.addSurvey()} label='Add Survey' primary={true} />
           <List>
             {this.state.surveys.map((survey, survey_index) => {
               return (
